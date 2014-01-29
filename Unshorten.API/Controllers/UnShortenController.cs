@@ -11,6 +11,23 @@ using System.Web.Http.Cors;
 using Unshorten.API.Models;
 
 namespace Unshorten.API.Controllers {
+    class MyWebClient : WebClient {
+        Uri _responseUri;
+
+        public Uri ResponseUri {
+            get { return _responseUri; }
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request) {
+            WebResponse response = base.GetWebResponse(request);
+            _responseUri = response.ResponseUri;
+            return response;
+        }
+
+    }
+
+
+    
     [EnableCors("*","GET", "*")]
     public class UnShortenController : ApiController {
 
@@ -21,7 +38,7 @@ namespace Unshorten.API.Controllers {
                 //HttpClient httpClient = new HttpClient();
                 var request = (HttpWebRequest)HttpWebRequest.Create(url);
                 request.Method = "HEAD";
-                request.AllowAutoRedirect = false;
+                request.AllowAutoRedirect = true;
                 //HttpRequestMessage request =
                 //   new HttpRequestMessage(HttpMethod.Get,
                 //      new Uri(url));
@@ -31,7 +48,8 @@ namespace Unshorten.API.Controllers {
                     response = await request.GetResponseAsync();
                     cache = new ShortUrl {
                         ShortURL = url,
-                        LongURL = response.Headers["Location"]
+                        LongURL = response.ResponseUri.AbsoluteUri
+                        //LongURL = response.Headers["Location"]
                     };
                 } catch (WebException we) {
                     var eResponse = we.Response;
