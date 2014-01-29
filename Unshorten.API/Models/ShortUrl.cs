@@ -7,5 +7,6 @@ namespace Unshorten.API.Models {
     public class ShortUrl {
         public string ShortURL { get; set; }
         public string LongURL { get; set; }
+        public bool RequestFailed { get; set; }
     }
 }
